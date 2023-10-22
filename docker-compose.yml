@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  trainingmain:
+    restart: always
+    image: assistiot/fl_training_collector
+    build: application
+    environment:
+      - SERVER_ADDRESS=localhost
+      - HOST=0.0.0.0
+      - PORT=8000
+      - FEDERATED_PORT=8080
+      - REPOSITORY_ADDRESS=http://flrepository:9012
+      - ORCHESTRATOR_ADDRESS=http://fl-orchestrator-app:5000
+      - JSON_FILE=jobs.json
+      - HM_SECRET_FILE=secret.txt
+      - HM_PUBLIC_FILE=public.txt
+    networks:
+      - default
+    extra_hosts:
+        - "host.docker.internal:host-gateway"
+    ports:
+      - "8000:8000"
+      - "8080:8080"
+    deploy:
+      resources:
+        reservations:
+          memory: 30g

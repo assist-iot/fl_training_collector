@@ -1,0 +1,14 @@
+kind: ConfigMap 
+apiVersion: v1 
+metadata:
+  name: training-collector-configmap 
+data:
+  SERVER_ADDRESS: "localhost"
+  HOST: "0.0.0.0"
+  PORT: "8000"
+  FEDERATED_PORT: "8080"
+  REPOSITORY_ADDRESS: "http://flrepositorylocaldb-flrepositorydb-flrepository.default.svc.cluster.local:9012"
+  ORCHESTRATOR_ADDRESS: "http://fl-orchestrator-app:5000"
+  JSON_FILE: "jobs.json"
+  HM_SECRET_FILE: "secret.txt"
+  HM_PUBLIC_FILE: "public.txt" 

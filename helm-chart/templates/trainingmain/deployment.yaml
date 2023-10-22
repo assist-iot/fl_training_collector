@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "trainingmain.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "trainingmain.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.trainingmain.autoscaling.enabled }}
+  replicas: {{ .Values.trainingmain.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "trainingmain.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "trainingmain.labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.trainingmain.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.enablerNodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if not .Values.enablerNodeSelector }}
+        {{- with .Values.trainingmain.nodeSelector }}
+      nodeSelector:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- end }}
+      {{- with .Values.trainingmain.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.trainingmain.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.trainingmain.podSecurityContext | nindent 8 }}
+      containers:
+        - name: trainingmain
+          securityContext:
+            {{- toYaml .Values.trainingmain.securityContext | nindent 12 }}
+          image: "{{ .Values.trainingmain.image.repository }}:{{ .Values.trainingmain.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.trainingmain.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.trainingmain.service.containerPort }}
+              protocol: {{ .Values.trainingmain.service.protocol }}
+            - containerPort: {{ .Values.trainingmain.service2.containerPort }}
+              protocol: {{ .Values.trainingmain.service2.protocol }}
+          resources:
+            {{- toYaml .Values.trainingmain.resources | nindent 12 }}
+          {{- with .Values.trainingmain.envVars }}
+          envFrom:
+            - configMapRef:
+                name: training-collector-configmap
+          {{- end }}

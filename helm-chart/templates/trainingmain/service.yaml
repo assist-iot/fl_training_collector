@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "trainingmain.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "trainingmain.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.trainingmain.service.type }}
+  ports:
+    - port: {{ .Values.trainingmain.service.port }}
+      targetPort: {{ .Values.trainingmain.service.targetPort }}
+      protocol: {{ .Values.trainingmain.service.protocol }}
+      {{- if and (or (eq .Values.trainingmain.service.type "NodePort") (eq .Values.trainingmain.service.type "LoadBalancer")) (not (empty .Values.trainingmain.service.nodePort)) }}
+      nodePort: {{ .Values.trainingmain.service.nodePort }}
+      {{ end }}
+  selector:
+    {{- include "trainingmain.selectorLabels" . | nindent 4 }}
